@@ -1,11 +1,33 @@
 import React, { useState } from 'react';
+import { validateEmail } from '../../utils/helpers';
 
 function ContactForm() {
   const [formState, setFormState] = useState({ name: '', email: '', message: '' });
   const { name, email, message } = formState
+  const [errorMessage, setErrorMessage] = useState('')
 
   function handleChange(e) {
-    setFormState({...formState, [e.target.name]: e.target.value })
+    if (e.target.name ==='email') {
+      const isValid = validateEmail(e.target.value);
+      console.log(isValid);
+      if (!isValid) {
+        setErrorMessage('Your email is not valid');
+      } else {
+        setErrorMessage('');
+      }
+    } else {
+      if (!e.target.value.length) {
+        setErrorMessage(`${e.target.name} is required.`);
+        console.log('errorMessage', errorMessage);
+      } else {
+        setErrorMessage('');
+      }
+    }
+
+
+    if (!errorMessage) {
+      setFormState({...formState, [e.target.name]: e.target.value })
+    }
   };
 
   function handleSubmit(e) {
@@ -13,11 +35,9 @@ function ContactForm() {
     console.log(formState)
   }
 
-  console.log(formState);
-
   return (
     <section>
-      <h1>Contact Me</h1>
+      <h1 data-testid="contact">Contact Me</h1>
       <form id="contact-form" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="name">Name:</label>
@@ -31,8 +51,12 @@ function ContactForm() {
           <label htmlFor="message">Message:</label>
           <textarea type="message" onChange={handleChange} defaultValue={message} rows="5" />
         </div>
-
-        <button type="submit">Submit</button>
+        {errorMessage && (
+          <div>
+            <p className="error-text ">{errorMessage}</p>
+          </div>
+        )}
+        <button type="submit" data-testid="submit">Submit</button>
       </form>
     </section>
   )
